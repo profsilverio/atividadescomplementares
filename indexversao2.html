@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Controle de Atividades Complementares</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-light p-4">
+  <div class="container">
+    <h2 class="mb-4">Registro de Atividades Complementares</h2>
+
+    <!-- Formulário -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <form id="atividadeForm" class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Nome do Evento</label>
+            <input type="text" id="evento" class="form-control" required>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Horas</label>
+            <input type="number" id="horas" class="form-control" min="0">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Categoria</label>
+            <select id="categoria" class="form-select" required></select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Tipo</label>
+            <select id="tipo" class="form-select" required></select>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-success">Adicionar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Atividades Lançadas</h5>
+        <table class="table table-bordered" id="tabelaAtividades">
+          <thead class="table-dark">
+            <tr>
+              <th>Evento</th>
+              <th>Categoria</th>
+              <th>Tipo</th>
+              <th>Horas</th>
+              <th>Pontos Obtidos</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Totais -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Totais</h5>
+        <ul id="totaisCategoria" class="list-group mb-3"></ul>
+        <h4>Total Geral: <span id="totalGeral">0</span> pontos</h4>
+      </div>
+    </div>
+
+    <!-- Botões -->
+    <button class="btn btn-primary" onclick="gerarPDF()">Gerar PDF</button>
+    <button class="btn btn-danger" onclick="limparDados()">Limpar Todos os Dados</button>
+  </div>
+
+<script>
+const categorias = {
+  "1": {
+    nome: "Aperfeiçoamento e enriquecimento cultural/esportivo",
+    max: 120,
+    tipos: {
+      "1.1": {nome: "Atividades culturais/esportivas", regra: (h)=>5, max:30},
+      "1.2": {nome: "Visitas técnicas/culturais", regra: (h)=>5, max:30},
+      "1.3": {nome: "Cursos (línguas, informática...)", regra: (h)=>h, max:40},
+      "1.4": {nome: "Trabalho voluntário", regra: (h)=>10, max:40}
+    }
+  },
+  "2": {
+    nome: "Divulgação científica e iniciação à docência",
+    max: 100,
+    tipos: {
+      "2.1": {nome: "Monitoria", regra: (h)=>15, max:60},
+      "2.2": {nome: "Atividades técnico-científicas", regra: (h)=>10, max:30},
+      "2.3": {nome: "Atividades pedagógicas de observação", regra: (h)=>5, max:20}
+    }
+  },
+  "3": {
+    nome: "Vivência acadêmica e profissional complementar",
+    max: 100,
+    tipos: {
+      "3.1": {nome: "Organização de eventos acadêmicos", regra: (h)=> (h>0?h:10), max:30},
+      "3.2": {nome: "Representação discente", regra: (h)=>5, max:20},
+      "3.3": {nome: "Ouvinte em bancas (TCC, dissertação...)", regra: (h)=>3, max:18},
+      "3.4": {nome: "Ouvinte em congressos/seminários", regra: (h)=> (h>0?h:10), max:40},
+      "3.5": {nome: "Visita técnica na área de atuação", regra: (h)=> (h>0?h:8), max:20},
+      "3.6": {nome: "Projetos de incubação", regra: (h)=>7.5, max:45}
+    }
+  },
+  "4": {
+    nome: "Pesquisa, Extensão e Publicações",
+    max: 100,
+    tipos: {
+      "4.1": {nome: "Projetos de pesquisa", regra: (h)=>7.5, max:45},
+      "4.2": {nome: "Projetos de extensão", regra: (h)=>7.5, max:45},
+      "4.3": {nome: "Artigo científico completo", regra: (h)=>25, max:50},
+      "4.4": {nome: "Resumo de artigo científico", regra: (h)=>15, max:50},
+      "4.5": {nome: "Publicações em jornais/meios eletrônicos", regra: (h)=>5, max:10}
+    }
+  }
+};
+
+let atividades = [];
+let totais = {};
+
+// === LOCALSTORAGE ===
+function salvarLocal(){
+  localStorage.setItem("atividades", JSON.stringify(atividades));
+}
+function carregarLocal(){
+  const dados = localStorage.getItem("atividades");
+  if(dados){
+    atividades = JSON.parse(dados);
+    atualizarTabela();
+    atualizarTotais();
+  }
+}
+function limparDados(){
+  if(confirm("Tem certeza que deseja limpar todos os dados?")){
+    atividades = [];
+    salvarLocal();
+    atualizarTabela();
+    atualizarTotais();
+  }
+}
+
+// === FUNÇÕES PRINCIPAIS ===
+function carregarCategorias(){
+  const select = document.getElementById("categoria");
+  select.innerHTML = "";
+  for(let c in categorias){
+    let opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = categorias[c].nome;
+    select.appendChild(opt);
+  }
+  carregarTipos();
+}
+
+function carregarTipos(){
+  const cat = document.getElementById("categoria").value;
+  const select = document.getElementById("tipo");
+  select.innerHTML = "";
+  for(let t in categorias[cat].tipos){
+    let opt = document.createElement("option");
+    opt.value = t;
+    opt.textContent = categorias[cat].tipos[t].nome;
+    select.appendChild(opt);
+  }
+}
+
+document.getElementById("categoria").addEventListener("change", carregarTipos);
+
+document.getElementById("atividadeForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  const evento = document.getElementById("evento").value;
+  const horas = parseFloat(document.getElementById("horas").value) || 0;
+  const cat = document.getElementById("categoria").value;
+  const tipo = document.getElementById("tipo").value;
+
+  let pontos = categorias[cat].tipos[tipo].regra(horas);
+  if(pontos > categorias[cat].tipos[tipo].max) pontos = categorias[cat].tipos[tipo].max;
+
+  atividades.push({evento, horas, cat, tipo, pontos});
+  salvarLocal();
+  atualizarTabela();
+  atualizarTotais();
+  e.target.reset();
+  carregarCategorias();
+});
+
+function atualizarTabela(){
+  const tbody = document.querySelector("#tabelaAtividades tbody");
+  tbody.innerHTML = "";
+  atividades.forEach((a, i)=>{
+    let tr = `<tr>
+      <td>${a.evento}</td>
+      <td>${categorias[a.cat].nome}</td>
+      <td>${categorias[a.cat].tipos[a.tipo].nome}</td>
+      <td>${a.horas}</td>
+      <td>${a.pontos}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="removerAtividade(${i})">Excluir</button></td>
+    </tr>`;
+    tbody.innerHTML += tr;
+  });
+}
+function removerAtividade(index){
+  atividades.splice(index,1);
+  salvarLocal();
+  atualizarTabela();
+  atualizarTotais();
+}
+
+function atualizarTotais(){
+  totais = {};
+  atividades.forEach(a=>{
+    if(!totais[a.cat]) totais[a.cat] = 0;
+    totais[a.cat] += a.pontos;
+    if(totais[a.cat] > categorias[a.cat].max) totais[a.cat] = categorias[a.cat].max;
+  });
+
+  const lista = document.getElementById("totaisCategoria");
+  lista.innerHTML = "";
+  for(let c in totais){
+    let li = `<li class="list-group-item">
+      ${categorias[c].nome}: ${totais[c]} pontos
+    </li>`;
+    lista.innerHTML += li;
+  }
+
+  let totalGeral = Object.values(totais).reduce((a,b)=>a+b,0);
+  document.getElementById("totalGeral").textContent = totalGeral;
+}
+
+// === PDF ===
+async function gerarPDF(){
+  if(atividades.length === 0){
+    alert("Nenhuma atividade lançada. Adicione atividades antes de gerar o PDF.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  try {
+    const logoBase64 = await toBase64("logo_redonda.png");
+    doc.addImage(logoBase64, "PNG", 10, 8, 25, 25);
+  } catch(e){}
+
+  doc.setFontSize(10);
+  doc.text("INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DE MATO GROSSO DO SUL", 40, 15);
+  doc.text("CAMPUS NOVA ANDRADINA", 40, 22);
+  doc.text("CURSO: TECNOLOGIA EM ANÁLISE E DESENVOLVIMENTO DE SISTEMAS - TADS", 40, 29);
+  doc.setFont("helvetica", "bold");
+  doc.text("PONTUAÇÃO PARA AS ATIVIDADES COMPLEMENTARES", 40, 36);
+  doc.setFont("helvetica", "normal");
+  doc.text("Prof. Silvério Luiz de Sousa", 40, 43);
+
+  let y = 55;
+  const agrupado = {};
+  atividades.forEach(a=>{
+    if(!agrupado[a.cat]) agrupado[a.cat] = [];
+    agrupado[a.cat].push(a);
+  });
+
+  let totalGeral = 0;
+  for(let c in agrupado){
+    let cat = categorias[c];
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(cat.nome, 10, y);
+    y += 5;
+
+    let dados = agrupado[c].map(a=>[
+      a.evento,
+      cat.tipos[a.tipo].nome,
+      a.horas,
+      a.pontos
+    ]);
+
+    doc.autoTable({
+      head: [["Evento", "Tipo", "Horas", "Pontos"]],
+      body: dados,
+      startY: y,
+      theme: "grid",
+      headStyles: { fillColor: [0, 102, 0] },
+      styles: { fontSize: 9 }
+    });
+
+    let subtotal = agrupado[c].reduce((s,a)=>s+a.pontos,0);
+    if(subtotal > cat.max) subtotal = cat.max;
+    totalGeral += subtotal;
+
+    y = doc.lastAutoTable.finalY + 7;
+    doc.setFont("helvetica", "italic");
+    doc.text(`Subtotal da categoria: ${subtotal} pontos (máx: ${cat.max})`, 12, y);
+    y += 12;
+
+    if(y > 250){
+      doc.addPage();
+      y = 20;
+    }
+  }
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(`TOTAL GERAL: ${totalGeral} pontos`, 10, y);
+
+  doc.save("atividades.pdf");
+}
+
+function toBase64(url) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => resolve(reader.result);
+      })
+      .catch(reject);
+  });
+}
+
+// iniciar
+carregarCategorias();
+carregarLocal();
+</script>
+</body>
+</html>
