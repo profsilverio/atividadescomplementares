@@ -23,6 +23,21 @@
     <div class="card mb-4">
       <div class="card-body">
         <form id="atividadeForm" class="row g-3">
+          <form id="atividadeForm" class="row g-3">
+
+  <!-- Dados do aluno -->
+  <div class="col-md-6">
+    <label class="form-label">Nome do Aluno</label>
+    <input type="text" id="nomeAluno" class="form-control" required>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">CPF</label>
+    <input type="text" id="cpfAluno" class="form-control" required>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Semestre de Formatura</label>
+    <input type="text" id="semestreAluno" class="form-control" placeholder="Ex.: 1/2025" required>
+  </div>
           <div class="col-md-4">
             <label class="form-label">Curso</label>
          <select id="cursoAluno" class="form-select" required>
@@ -116,26 +131,7 @@
       </div>
     </div>
 
-    <!-- Dados do aluno -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Dados do Aluno</h5>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Nome do Aluno</label>
-            <input type="text" id="nomeAluno" class="form-control" required>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">CPF</label>
-            <input type="text" id="cpfAluno" class="form-control" required>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Semestre de Formatura</label>
-            <input type="text" id="semestreAluno" class="form-control" placeholder="Ex.: 1/2025" required>
-          </div>
-        </div>
-      </div>
-    </div>
+  
 
     <!-- Botões -->
 <div class="sticky-actions">
@@ -156,23 +152,6 @@
 </script>
 
 <script>
-   const selectCurso = document.getElementById("cursoAluno");
-
-document.addEventListener("DOMContentLoaded", function () {
-  const cursoSalvo = localStorage.getItem("cursoAluno");
-
-  if (cursoSalvo) {
-    // Se já tem salvo, mostra no select
-    selectCurso.value = cursoSalvo;
-  }
-
-  // Sempre que mudar, atualiza o valor salvo
-  selectCurso.addEventListener("change", function () {
-    if (selectCurso.value !== "") {
-      localStorage.setItem("cursoAluno", selectCurso.value);
-    }
-  });
-});
 /* ============================
    REGRAS (Anexo I - ATIVIDADES.pdf)
    ============================ */
@@ -356,7 +335,7 @@ const storageKeys = {
   atividades: "atividades",
   aluno: "dadosAluno"
 };
-
+//aqui
 function salvarLocal(){
   localStorage.setItem(storageKeys.atividades, JSON.stringify(atividades));
   const aluno = {
@@ -368,6 +347,7 @@ function salvarLocal(){
   localStorage.setItem(storageKeys.aluno, JSON.stringify(aluno));
 }
 
+//aqui
 function carregarLocal(){
   const dados = localStorage.getItem(storageKeys.atividades);
   if(dados){
@@ -401,12 +381,45 @@ function carregarLocal(){
  // }
 //}
 
+/*
+function limparDados() {
+  if (confirm("Tem certeza que deseja limpar todos os dados?")) {
+    atividades = [];
+    localStorage.removeItem(storageKeys.atividades);
+    localStorage.removeItem(storageKeys.aluno);
+    atualizarTabela();
+    atualizarTotais();
+    document.getElementById("nomeAluno").value = "";
+    document.getElementById("cpfAluno").value = "";
+    document.getElementById("semestreAluno").value = "";
+    //.getElementById("cursoAluno").value = "";
+  }
+}
+*/
 
 function limparDados() {
-  const cursoSalvo = localStorage.getItem("cursoAluno"); // guarda o curso
-  localStorage.clear(); // limpa tudo
-  if (cursoSalvo) {
-    localStorage.setItem("cursoAluno", cursoSalvo); // restaura o curso
+  if (confirm("Tem certeza que deseja limpar todos os dados?")) {
+    atividades = [];
+    localStorage.removeItem(storageKeys.atividades);
+    
+    // Carrega os dados do aluno antes de apagar
+    const dadosAluno = JSON.parse(localStorage.getItem(storageKeys.aluno) || "{}");
+    const cursoSalvo = dadosAluno.curso || "";
+
+    // Remove os dados do aluno
+    localStorage.removeItem(storageKeys.aluno);
+
+    atualizarTabela();
+    atualizarTotais();
+
+    // Limpa apenas os outros campos
+    document.getElementById("nomeAluno").value = "";
+    document.getElementById("cpfAluno").value = "";
+    document.getElementById("semestreAluno").value = "";
+
+    // Mantém o curso selecionado
+    document.getElementById("cursoAluno").value = cursoSalvo;
+    localStorage.setItem(storageKeys.aluno, JSON.stringify({ curso: cursoSalvo }));
   }
 }
 /* ============================
@@ -511,8 +524,15 @@ document.getElementById("atividadeForm").addEventListener("submit", e=>{
   salvarLocal();
   atualizarTabela();
   atualizarTotais();
-  e.target.reset();
-  carregarCategorias();
+// salva o curso antes de resetar
+const cursoSelecionado = document.getElementById("cursoAluno").value;
+
+// limpa o formulário
+e.target.reset();
+carregarCategorias();
+
+// restaura o curso depois do reset
+document.getElementById("cursoAluno").value = cursoSelecionado;
 });
 
 /* ============================
