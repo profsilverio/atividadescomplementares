@@ -541,6 +541,33 @@ function atualizarTotais(){
 }
 
 /* ============================
+   excluir aluno
+   ============================ */
+
+
+function excluirAluno() {
+  if (atividades.length > 0) {
+    alert("Não é possível excluir os dados do aluno enquanto houver atividades cadastradas.");
+    return;
+  }
+
+  if (confirm("Tem certeza que deseja excluir os dados do aluno?")) {
+    localStorage.removeItem(storageKeys.aluno);
+
+    // Limpar campos do formulário
+    document.getElementById("nomeAluno").value = "";
+    document.getElementById("cpfAluno").value = "";
+    document.getElementById("semestreAluno").value = "";
+    document.getElementById("cursoAluno").value = "";
+
+    // Atualizar tabela de exibição
+    atualizarTabelaAluno();
+
+    alert("Dados do aluno excluídos com sucesso!");
+  }
+}
+
+/* ============================
    PDF — somente pontos VÁLIDOS
    ============================ */
 async function gerarPDF(){
