@@ -1,0 +1,20 @@
+.form-hint {
+  font-size: .85rem;
+  color: #555;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  background: #f8f9fa;
+  padding: .75rem 0;
+  z-index: 10;
+}
+
+.table thead th {
+  white-space: nowrap;
+}
+
+.badge-unidade {
+  font-size: .75rem;
+}

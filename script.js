@@ -2,30 +2,7 @@
    REGRAS (Anexo I - ATIVIDADES.pdf)
    ============================ */
 
-/*
- Estrutura:
- categorias = {
-   "1": {
-     nome, maxCurso, maxSemestre,
-     tipos: {
-       "1.1": {
-         nome, unidade, // "horas" | "eventos" | "meses"s
-         regra: ({qtd, area}) => pontosBrutos,
-         maxSemestreTipo // limite por semestre do tipo
-       },
-       ...
-     }
-   },
-   ...
- }
-
- Observações das regras:
- - Onde o documento diz: "1 ponto por hora OU 10 pontos por evento caso não conste carga horária",
-   interpretamos como entrada por "horas" OU por "eventos".
-   Para simplicidade do lançamento, use o campo Quantidade com a unidade exibida no "badge".
-   Você pode alternar a unidade no seletor de tipo quando aplicável.
-*/
-
+// (mantive todas as regras iguais — sem alterações)
 const categorias = {
   "1": {
     nome: "Atividades de aperfeiçoamento e enriquecimento cultural e esportivo",
@@ -35,25 +12,25 @@ const categorias = {
       "1.1": {
         nome: "Atividades culturais/esportivas (filme, teatro, feiras, olimpíadas etc.)",
         unidade: "eventos",
-        regra: ({qtd}) => 5 * (qtd || 1), // 5 pontos por atividade
+        regra: ({qtd}) => 5 * (qtd || 1),
         maxSemestreTipo: 30
       },
       "1.2": {
         nome: "Visitas técnicas e culturais (museus, memoriais, empresas etc.)",
         unidade: "eventos",
-        regra: ({qtd}) => 5 * (qtd || 1), // 5 pontos por visita
+        regra: ({qtd}) => 5 * (qtd || 1),
         maxSemestreTipo: 30
       },
       "1.3": {
         nome: "Cursos (línguas, informática, culturais, sociais, específicos do curso)",
         unidade: "horas",
-        regra: ({qtd}) => (qtd || 0) * 1, // 1 ponto por hora
+        regra: ({qtd}) => (qtd || 0) * 1,
         maxSemestreTipo: 40
       },
       "1.4": {
         nome: "Trabalho voluntário / comunitário / associações (brigadas, APAE etc.)",
         unidade: "eventos",
-        regra: ({qtd}) => 10 * (qtd || 1), // 10 pontos por participação comprovada
+        regra: ({qtd}) => 10 * (qtd || 1),
         maxSemestreTipo: 40
       }
     }
@@ -66,20 +43,20 @@ const categorias = {
       "2.1": {
         nome: "Monitoria remunerada ou voluntária",
         unidade: "eventos",
-        regra: ({qtd}) => 15 * (qtd || 1), // 15 pontos por participação
+        regra: ({qtd}) => 15 * (qtd || 1),
         maxSemestreTipo: 60
       },
       "2.2": {
         nome: "Atividades técnico-científicas (apresentação, palestras, bancas etc.)",
         unidade: "eventos",
-        areaEspecifica: true, // 10 pontos ou 15 se da área específica do curso
+        areaEspecifica: true,
         regra: ({qtd, area}) => (area ? 15 : 10) * (qtd || 1),
         maxSemestreTipo: 30
       },
       "2.3": {
         nome: "Atividades pedagógicas de observação",
         unidade: "eventos",
-        regra: ({qtd}) => 5 * (qtd || 1), // 5 pontos por participação
+        regra: ({qtd}) => 5 * (qtd || 1),
         maxSemestreTipo: 20
       }
     }
@@ -91,7 +68,7 @@ const categorias = {
     tipos: {
       "3.1": {
         nome: "Organização de eventos acadêmicos e festivais",
-        unidade: "auto", // horas OU eventos (10 se sem carga horária)
+        unidade: "auto",
         regra: ({qtd, unidade}) => unidade === "horas" ? (qtd || 0) * 1 : 10 * (qtd || 1),
         maxSemestreTipo: 30,
         unidadesPossiveis: ["horas","eventos"]
@@ -110,14 +87,14 @@ const categorias = {
       },
       "3.4": {
         nome: "Ouvinte em congressos, seminários, simpósios e afins",
-        unidade: "auto", // horas OU eventos (10 se sem carga horária)
+        unidade: "auto",
         regra: ({qtd, unidade}) => unidade === "horas" ? (qtd || 0) * 1 : 10 * (qtd || 1),
         maxSemestreTipo: 40,
         unidadesPossiveis: ["horas","eventos"]
       },
       "3.5": {
         nome: "Visita técnica relacionada à área de atuação",
-        unidade: "auto", // horas OU eventos (8 se sem carga horária)
+        unidade: "auto",
         regra: ({qtd, unidade}) => unidade === "horas" ? (qtd || 0) * 1 : 8 * (qtd || 1),
         maxSemestreTipo: 20,
         unidadesPossiveis: ["horas","eventos"]
@@ -125,7 +102,7 @@ const categorias = {
       "3.6": {
         nome: "Participação em projetos de incubação",
         unidade: "meses",
-        regra: ({qtd}) => 7.5 * (qtd || 0), // 7,5 pontos por mês
+        regra: ({qtd}) => 7.5 * (qtd || 0),
         maxSemestreTipo: 45
       }
     }
@@ -138,26 +115,26 @@ const categorias = {
       "4.1": {
         nome: "Projetos e grupos de pesquisa",
         unidade: "meses",
-        regra: ({qtd}) => 7.5 * (qtd || 0), // 7,5 pontos por mês
+        regra: ({qtd}) => 7.5 * (qtd || 0),
         maxSemestreTipo: 45
       },
       "4.2": {
         nome: "Projetos e grupos de extensão",
         unidade: "meses",
-        regra: ({qtd}) => 7.5 * (qtd || 0), // 7,5 pontos por mês
+        regra: ({qtd}) => 7.5 * (qtd || 0),
         maxSemestreTipo: 45
       },
       "4.3": {
         nome: "Artigo científico completo em revista/periódico",
-        unidade: "publicações", // eventos
-        areaEspecifica: true, // 25 pontos, ou 30 se da área específica
+        unidade: "publicações",
+        areaEspecifica: true,
         regra: ({qtd, area}) => (area ? 30 : 25) * (qtd || 1),
         maxSemestreTipo: 50
       },
       "4.4": {
         nome: "Resumo de artigo científico em revista/periódico",
-        unidade: "publicações", // eventos
-        areaEspecifica: true, // 15 pontos, ou 20 se da área específica
+        unidade: "publicações",
+        areaEspecifica: true,
         regra: ({qtd, area}) => (area ? 20 : 15) * (qtd || 1),
         maxSemestreTipo: 50
       },
@@ -174,7 +151,7 @@ const categorias = {
 /* ============================
    ESTADO + LOCALSTORAGE
    ============================ */
-let atividades = []; // {data, semestreAtividade, evento, cat, tipo, unidadeUsada, quantidade, area, pontosBrutos}
+let atividades = []; // {data, semestreAtividade, evento, cat, tipo, unidadeUsada, quantidade, area, pontosBrutos, cpf}
 let totais = {};
 
 const storageKeys = {
@@ -191,6 +168,7 @@ function salvarLocal(){
     curso: document.getElementById("cursoAluno").value || ""
   };
   localStorage.setItem(storageKeys.aluno, JSON.stringify(aluno));
+  atualizarTabelaAluno();
 }
 
 function carregarLocal(){
@@ -209,32 +187,24 @@ function carregarLocal(){
   atualizarTabela();
   atualizarTotais();
   atualizarContadores();
+  atualizarTabelaAluno();
+}
+
+function atualizarTabelaAluno() {
+  const aluno = JSON.parse(localStorage.getItem(storageKeys.aluno) || "{}");
+  document.getElementById("alunoNomeTabela").textContent = aluno.nome || "";
+  document.getElementById("alunoCpfTabela").textContent = aluno.cpf || "";
+  document.getElementById("alunoSemestreTabela").textContent = aluno.semestre || "";
+  document.getElementById("alunoCursoTabela").textContent = aluno.curso || "";
 }
 
 function limparDados() {
-  if (confirm("Tem certeza que deseja limpar todos os dados?")) {
+  if (confirm("Tem certeza que deseja limpar todas as atividades?")) {
     atividades = [];
     localStorage.removeItem(storageKeys.atividades);
-    
-    // Carrega os dados do aluno antes de apagar
-    const dadosAluno = JSON.parse(localStorage.getItem(storageKeys.aluno) || "{}");
-    const cursoSalvo = dadosAluno.curso || "";
-
-    // Remove os dados do aluno
-    localStorage.removeItem(storageKeys.aluno);
-
     atualizarTabela();
     atualizarTotais();
     atualizarContadores();
-
-    // Limpa apenas os outros campos
-    document.getElementById("nomeAluno").value = "";
-    document.getElementById("cpfAluno").value = "";
-    document.getElementById("semestreAluno").value = "";
-
-    // Mantém o curso selecionado
-    document.getElementById("cursoAluno").value = cursoSalvo;
-    localStorage.setItem(storageKeys.aluno, JSON.stringify({ curso: cursoSalvo }));
   }
 }
 
@@ -260,7 +230,6 @@ function atualizarUnidadeUI(cat, tipo){
   const grupoArea = document.getElementById("grupoAreaEspecifica");
   const chkArea = document.getElementById("areaEspecifica");
 
-  // Verifica se a categoria e tipo existem
   if (!categorias[cat] || !categorias[cat].tipos || !categorias[cat].tipos[tipo]) {
     console.warn(`Categoria ${cat} ou tipo ${tipo} não encontrado`);
     return;
@@ -270,9 +239,7 @@ function atualizarUnidadeUI(cat, tipo){
   let unidade = info.unidade;
   let mostrarArea = !!info.areaEspecifica;
 
-  // unidades dinâmicas (auto)
   if(info.unidadesPossiveis){
-    // por padrão, usamos "horas" (para 3.1, 3.4, 3.5)
     unidade = info.unidadesPossiveis[0];
   }
 
@@ -298,7 +265,7 @@ function carregarTipos(){
     opt.textContent = `${t} - ${categorias[cat].tipos[t].nome}`;
     select.appendChild(opt);
   }
-  
+
   if (select.options.length > 0) {
     atualizarUnidadeUI(cat, select.value);
   }
@@ -308,19 +275,17 @@ function carregarTipos(){
 function atualizarContadores() {
   const catSelecionada = document.getElementById("categoria").value;
   const tipoSelecionado = document.getElementById("tipo").value;
-  
+
   if (!catSelecionada) {
     document.getElementById("countCategoria").textContent = "Selecione uma categoria";
     document.getElementById("countTipo").textContent = "Selecione um tipo";
     return;
   }
-  
-  // Conta atividades da categoria selecionada
+
   const countCat = atividades.filter(a => a.cat === catSelecionada).length;
   document.getElementById("countCategoria").textContent = 
     countCat + (countCat === 1 ? " atividade nesta categoria" : " atividades nesta categoria");
-  
-  // Conta atividades do tipo selecionado
+
   const countTipo = atividades.filter(a => a.cat === catSelecionada && a.tipo === tipoSelecionado).length;
   document.getElementById("countTipo").textContent = 
     countTipo + (countTipo === 1 ? " atividade deste tipo" : " atividades deste tipo");
@@ -340,7 +305,6 @@ document.getElementById("tipo").addEventListener("change", ()=>{
 
 /* ============================
    Lançamento
-   DESENVOLVIDO POR: SILVERIO LUIZ DE SOUSA - EM: 23/08/2025 - http://silveriosousa.com.br
    ============================ */
 document.getElementById("atividadeForm").addEventListener("submit", e=>{
   e.preventDefault();
@@ -352,8 +316,8 @@ document.getElementById("atividadeForm").addEventListener("submit", e=>{
   const tipo = document.getElementById("tipo").value;
   let quantidade = parseFloat(document.getElementById("quantidade").value) || 0;
   const chkArea = document.getElementById("areaEspecifica").checked;
+  const cpfAlunoVal = document.getElementById("cpfAluno").value || "";
 
-  // Verifica se a categoria e tipo existem
   if (!categorias[cat] || !categorias[cat].tipos || !categorias[cat].tipos[tipo]) {
     alert(`Erro: Categoria ou tipo não encontrado!`);
     return;
@@ -372,52 +336,50 @@ document.getElementById("atividadeForm").addEventListener("submit", e=>{
     unidadeUsada,
     quantidade,
     area: !!chkArea,
-    pontosBrutos
+    pontosBrutos,
+    cpf: cpfAlunoVal
   };
 
   if(editIndex !== null){
-    atividades[editIndex] = registro;  // substitui
+    atividades[editIndex] = registro;
     editIndex = null;
     document.querySelector("#atividadeForm button[type=submit]").textContent = "Adicionar";
   } else {
-    atividades.push(registro); // novo
+    atividades.push(registro);
   }
 
   salvarLocal();
   atualizarTabela();
   atualizarTotais();
   atualizarContadores();
-  
-  // salva o curso antes de resetar
-  const cursoSelecionado = document.getElementById("cursoAluno").value;
 
-  // limpa o formulário
-  e.target.reset();
+  // Limpa apenas os campos da atividade (não toca nos dados do aluno)
+  document.getElementById("data").value = "";
+  document.getElementById("semestreAtividade").value = "";
+  document.getElementById("evento").value = "";
+  document.getElementById("quantidade").value = "";
+  document.getElementById("areaEspecifica").checked = false;
   carregarCategorias();
-
-  // restaura o curso depois do reset
-  document.getElementById("cursoAluno").value = cursoSelecionado;
 });
 
 /* ============================
    Tabela
    ============================ */
-let editIndex = null; // controla se estamos editando
+let editIndex = null;
 
 function atualizarTabela(){
   const tbody = document.querySelector("#tabelaAtividades tbody");
   tbody.innerHTML = "";
   atividades.forEach((a, i)=>{
     const tr = document.createElement("tr");
-    
-    // Verifica se a categoria e o tipo existem antes de tentar acessar suas propriedades
+
     const categoriaNome = categorias[a.cat] ? categorias[a.cat].nome : `Categoria ${a.cat} (não encontrada)`;
-    
+
     let tipoNome = `Tipo ${a.tipo} (não encontrado)`;
     if (categorias[a.cat] && categorias[a.cat].tipos && categorias[a.cat].tipos[a.tipo]) {
       tipoNome = categorias[a.cat].tipos[a.tipo].nome;
     }
-    
+
     tr.innerHTML = `
       <td>${a.data || ""}</td>
       <td>${a.semestreAtividade || ""}</td>
@@ -439,18 +401,15 @@ function editarAtividade(index){
   const a = atividades[index];
   editIndex = index;
 
-  // Preenche o formulário com os dados
   document.getElementById("data").value = a.data;
   document.getElementById("semestreAtividade").value = a.semestreAtividade;
   document.getElementById("evento").value = a.evento;
-  document.getElementById("cursoAluno").value = document.getElementById("cursoAluno").value; // mantém curso
-  
-  // Verifica se a categoria existe antes de selecioná-la
+  // mantém dados do aluno como estão (não altera nome/cpf/semestre/curso)
+
   if (categorias[a.cat]) {
     document.getElementById("categoria").value = a.cat;
     carregarTipos();
-    
-    // Verifica se o tipo existe antes de selecioná-lo
+
     if (categorias[a.cat].tipos && categorias[a.cat].tipos[a.tipo]) {
       document.getElementById("tipo").value = a.tipo;
       atualizarUnidadeUI(a.cat, a.tipo);
@@ -459,45 +418,36 @@ function editarAtividade(index){
     }
   } else {
     console.warn(`Categoria ${a.cat} não encontrada`);
-    carregarCategorias(); // Carrega categorias padrão se a categoria não existir
+    carregarCategorias();
   }
-  
+
   document.getElementById("quantidade").value = a.quantidade;
   document.getElementById("areaEspecifica").checked = a.area;
 
-  // Troca o botão de submit para "Atualizar"
   document.querySelector("#atividadeForm button[type=submit]").textContent = "Atualizar";
-  
-  // Atualiza contadores
+
   atualizarContadores();
 }
 
 function removerAtividade(index){
-  atividades.splice(index,1);
-  salvarLocal();
-  atualizarTabela();
-  atualizarTotais();
-  atualizarContadores();
+  if(confirm("Deseja realmente excluir esta atividade?")){
+    atividades.splice(index,1);
+    salvarLocal();
+    atualizarTabela();
+    atualizarTotais();
+    atualizarContadores();
+  }
 }
 
 /* ============================
    Cálculo com limites — atribuição por linha (pontos válidos)
    ============================ */
-/*
-Passos:
-1) Limite por TIPO e SEMESTRE (maxSemestreTipo): FIFO por ordem de lançamento.
-2) Limite por CATEGORIA e SEMESTRE (maxSemestre): FIFO considerando valores já limitados do passo 1.
-3) Limite por CATEGORIA no curso (maxCurso): FIFO somando todos os semestres da categoria.
-Retorna vetor com pontosEfetivos por linha, além dos totais por categoria.
-*/
 function calcularPontosEfetivosPorLinha(){
   const n = atividades.length;
   const passo1 = new Array(n).fill(0);
   const passo2 = new Array(n).fill(0);
   const efetivo = new Array(n).fill(0);
 
-  // Índices auxiliares
-  // Agrupa por (cat,tipo,sem)
   const gruposTipoSem = {};
   atividades.forEach((a, idx)=>{
     const key = `${a.cat}|${a.tipo}|${a.semestreAtividade}`;
@@ -505,10 +455,8 @@ function calcularPontosEfetivosPorLinha(){
     gruposTipoSem[key].push(idx);
   });
 
-  // 1) aplica maxSemestreTipo (FIFO)
   for(const key in gruposTipoSem){
     const [cat, tipo, sem] = key.split("|");
-    // Verifica se categoria e tipo existem
     const maxTipoSem = (categorias[cat] && categorias[cat].tipos && categorias[cat].tipos[tipo]) ? 
                         categorias[cat].tipos[tipo].maxSemestreTipo : Infinity;
     let resto = maxTipoSem;
@@ -520,7 +468,6 @@ function calcularPontosEfetivosPorLinha(){
     }
   }
 
-  // 2) aplica maxSemestre (por categoria e semestre) — FIFO sobre ordem de lançamento desse cat/sem
   const gruposCatSem = {};
   atividades.forEach((a, idx)=>{
     const key = `${a.cat}|${a.semestreAtividade}`;
@@ -530,9 +477,7 @@ function calcularPontosEfetivosPorLinha(){
 
   for(const key in gruposCatSem){
     const [cat, sem] = key.split("|");
-    // Verifica se categoria existe
     const maxSem = categorias[cat] ? categorias[cat].maxSemestre : Infinity;
-    // soma dos valores do passo1 neste cat/sem
     const soma = gruposCatSem[key].reduce((acc, i)=> acc + passo1[i], 0);
     let limite = Math.min(soma, maxSem);
     for(const idx of gruposCatSem[key]){
@@ -543,7 +488,6 @@ function calcularPontosEfetivosPorLinha(){
     }
   }
 
-  // 3) aplica maxCurso (por categoria) — FIFO na ordem de lançamento da categoria
   const gruposCat = {};
   atividades.forEach((a, idx)=>{
     const key = `${a.cat}`;
@@ -553,7 +497,6 @@ function calcularPontosEfetivosPorLinha(){
 
   const porCatTotal = {};
   for(const cat in gruposCat){
-    // Verifica se categoria existe
     const maxCurso = categorias[cat] ? categorias[cat].maxCurso : Infinity;
     const soma = gruposCat[cat].reduce((acc, i)=> acc + passo2[i], 0);
     let limite = Math.min(soma, maxCurso);
@@ -572,7 +515,6 @@ function calcularPontosEfetivosPorLinha(){
 }
 
 function calcularTotaisLimitados(){
-  // Mantido para o resumo na UI (reuso do método de antes, mas agora usamos o novo)
   const { porCatTotal } = calcularPontosEfetivosPorLinha();
   return { porCatTotal };
 }
@@ -610,7 +552,6 @@ async function gerarPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  // Função auxiliar para obter nomes de categoria/tipo com segurança
   const getNomeCategoria = (cat) => categorias[cat] ? categorias[cat].nome : `Categoria ${cat} (não encontrada)`;
   const getNomeTipo = (cat, tipo) => {
     if (categorias[cat] && categorias[cat].tipos && categorias[cat].tipos[tipo]) {
@@ -619,13 +560,11 @@ async function gerarPDF(){
     return `Tipo ${tipo} (não encontrado)`;
   };
 
-  // Logo
   try {
     const logoBase64 = await toBase64("logo_redonda.png"); 
     doc.addImage(logoBase64, "PNG", 8, 8, 25, 25);
   } catch(e){}
 
-  // Cabeçalho fixo
   doc.setFontSize(10);
   doc.text("INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DE MATO GROSSO DO SUL", 40, 15);
   doc.text("CAMPUS NOVA ANDRADINA", 40, 20);
@@ -633,7 +572,6 @@ async function gerarPDF(){
   doc.setFont("helvetica", "bold");
   doc.text("PONTUAÇÃO PARA AS ATIVIDADES COMPLEMENTARES", 40, 30);
 
-  // Dados do aluno
   const cursoAluno = document.getElementById("cursoAluno").value;
   if(!cursoAluno){
     alert("Selecione um curso antes de gerar o PDF.");
@@ -652,7 +590,6 @@ async function gerarPDF(){
 
   let y = 70;
 
-  // --- resto do código de gerar tabelas, totais e rodapé permanece igual ---
   const { efetivoPorLinha, porCatTotal } = calcularPontosEfetivosPorLinha();
   const agrupado = {};
   atividades.forEach((a, i)=>{
@@ -718,18 +655,14 @@ async function gerarPDF(){
   doc.setFontSize(12);
   doc.text(`TOTAL GERAL: ${totalGeral} pontos`, 10, y);
 
-  // Observação
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.text("Observação: o PDF exibe apenas pontos VÁLIDOS, já limitados por subcategoria/semestre, por categoria/semestre e por categoria (curso).", 10, 255);
 
-  // ASSINATURA
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   const pageWidth = doc.internal.pageSize.getWidth();
-  // linha de assinatura
   doc.text("__________________________________________________________________", pageWidth/2, 265, { align: "center" });
-  // nome do aluno
   doc.text(nomeAluno, pageWidth/2, 270, { align: "center" });
 
   const pageCount = doc.internal.getNumberOfPages();
@@ -743,7 +676,6 @@ async function gerarPDF(){
   doc.save(nomeAluno+"atividades_validas.pdf");
 }
 
-// utilitário para carregar imagem
 function toBase64(url) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -757,11 +689,9 @@ function toBase64(url) {
   });
 }
 
-// Funções de abertura de instruções
 function abrirInstrucoes() {
-  // Abre uma nova janela com largura e altura definidas
   window.open(
-    'instrucoes.html', // aqui você coloca o link para sua página de instruções
+    'instrucoes.html',
     'Instrucoes',
     'width=800,height=600,scrollbars=yes,resizable=yes'
   );
@@ -771,15 +701,11 @@ function abrirInstrucoes() {
    FUNÇÕES DE EXPORTAÇÃO E IMPORTAÇÃO JSON
    ============================ */
 
-// Função para validar dados importados
 function validarAtividades(atividades) {
-  // Validação básica - verifica se é um array
   if (!Array.isArray(atividades)) {
     console.error("Dados importados não são um array válido");
     return false;
   }
-  
-  // Verifica se cada atividade tem os campos mínimos necessários
   for (let i = 0; i < atividades.length; i++) {
     const a = atividades[i];
     if (!a.cat || !a.tipo || a.quantidade === undefined || a.pontosBrutos === undefined) {
@@ -787,11 +713,9 @@ function validarAtividades(atividades) {
       return false;
     }
   }
-  
   return true;
 }
 
-// Função para exportar dados como JSON
 function exportarJSON() {
   const dadosExport = {
     atividades: atividades,
@@ -802,11 +726,9 @@ function exportarJSON() {
       curso: document.getElementById("cursoAluno").value || ""
     }
   };
-  
+
   const dataStr = JSON.stringify(dadosExport, null, 2);
   const dataBlob = new Blob([dataStr], { type: 'application/json' });
-  
-  // Cria elemento para download
   const a = document.createElement('a');
   a.download = `atividades_complementares_${new Date().toISOString().slice(0,10)}.json`;
   a.href = URL.createObjectURL(dataBlob);
@@ -814,25 +736,23 @@ function exportarJSON() {
   URL.revokeObjectURL(a.href);
 }
 
-// Função para importar dados de arquivo JSON
 function importarJSON(input) {
   const file = input.files[0];
   if (!file) return;
-  
+
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const dadosImport = JSON.parse(e.target.result);
-      
+
       if (confirm("Importar os dados irá substituir todas as informações atuais. Deseja continuar?")) {
-        // Importa os dados com validação
         if (dadosImport.atividades && validarAtividades(dadosImport.atividades)) {
           atividades = dadosImport.atividades;
         } else {
           alert("O arquivo importado contém dados de atividades inválidos");
           return;
         }
-        
+
         if (dadosImport.aluno) {
           const aluno = dadosImport.aluno;
           document.getElementById("nomeAluno").value = aluno.nome || "";
@@ -840,8 +760,7 @@ function importarJSON(input) {
           document.getElementById("semestreAluno").value = aluno.semestre || "";
           document.getElementById("cursoAluno").value = aluno.curso || "";
         }
-        
-        // Salva, atualiza a interface e notifica
+
         salvarLocal();
         atualizarTabela();
         atualizarTotais();
@@ -852,11 +771,10 @@ function importarJSON(input) {
       alert("Erro ao importar arquivo: " + error.message);
       console.error("Erro na importação:", error);
     }
-    
-    // Reseta o input para permitir selecionar o mesmo arquivo novamente
+
     input.value = "";
   };
-  
+
   reader.readAsText(file);
 }
 
@@ -885,7 +803,6 @@ document.getElementById("cpfAluno").addEventListener("input", function(e){
 carregarCategorias();
 carregarLocal();
 
-// Salva dados do aluno on change
 ["nomeAluno","cpfAluno","semestreAluno","cursoAluno"].forEach(id=>{
   document.getElementById(id).addEventListener("change", salvarLocal);
 });
