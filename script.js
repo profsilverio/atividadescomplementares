@@ -148,6 +148,7 @@ const categorias = {
   }
 };
 
+
 /* ============================
    ESTADO + LOCALSTORAGE
    ============================ */
@@ -270,6 +271,8 @@ function carregarTipos(){
     atualizarUnidadeUI(cat, select.value);
   }
 }
+
+
 
 // Função para contar atividades por categoria e tipo
 function atualizarContadores() {

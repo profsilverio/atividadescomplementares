@@ -66,14 +66,16 @@
           </div>
 
           <div class="col-md-2">
-            <label class="form-label">Data</label>
+            <label class="form-label">Data do Evento</label>
             <input type="date" id="data" class="form-control" required>
           </div>
-          <div class="col-md-2">
-            <label class="form-label">Semestre da Atividade</label>
-            <input type="text" id="semestreAtividade" class="form-control" placeholder="Ex.: 1/2025" required>
-            <div class="form-hint">Formato: 1/AAAA ou 2/AAAA</div>
-          </div>
+       <div class="col-md-2">
+  <label class="form-label">Semestre da Atividade</label>
+  <input type="text" id="semestreAtividade" class="form-control" 
+         placeholder="Ex.: 1/2025" required readonly>
+  <div class="form-hint">Formato: 1/AAAA ou 2/AAAA</div>
+</div>
+
           <div class="col-md-4">
             <label class="form-label">Nome do Evento</label>
             <input type="text" id="evento" class="form-control" required>
@@ -188,6 +190,67 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js">
+
+
+/* ============================
+   AUTO-PREENCHER SEMESTRE DA ATIVIDADE (robusto)
+   ============================ */
+document.addEventListener("DOMContentLoaded", function () {
+  const dataInput = document.getElementById("data");
+  const semInput  = document.getElementById("semestreAtividade");
+
+  if (!dataInput || !semInput) {
+    console.error("Auto-preencher: elemento(s) não encontrados:", {
+      data: !!dataInput,
+      semestre: !!semInput
+    });
+    return;
+  }
+
+/*preencher SEMESTRE AUTOMATICO*/
+
+  function preencherSemestre(dataValor) {
+    if (!dataValor) {
+      semInput.value = "";
+      return;
+    }
+
+    try {
+      // Forçar horário para evitar problema de fuso horário
+      const iso = dataValor.includes("T") ? dataValor : dataValor + "T00:00:00";
+      const dt = new Date(iso);
+
+      if (isNaN(dt.getTime())) {
+        console.warn("Auto-preencher: data inválida ->", dataValor);
+        semInput.value = "";
+        return;
+      }
+
+      const ano = dt.getFullYear();
+      const mes = dt.getMonth() + 1;
+      const semestre = mes <= 6 ? 1 : 2;
+      semInput.value = `${semestre}/${ano}`;
+    } catch (err) {
+      console.error("Auto-preencher: erro ao processar data", err);
+      semInput.value = "";
+    }
+  }
+
+  // Captura quando o usuário seleciona a data (change) ou digita/cola (input)
+  dataInput.addEventListener("change", function () { preencherSemestre(this.value); });
+  dataInput.addEventListener("input",  function () { preencherSemestre(this.value); });
+
+  // Se já existir valor ao carregar a página (situação de edição/carregamento de localStorage)
+  if (dataInput.value) {
+    preencherSemestre(dataInput.value);
+  }
+
+  // Limpa o semestre caso o campo data seja apagado
+  dataInput.addEventListener("blur", function () {
+    if (!this.value) semInput.value = "";
+  });
+});
+  </script>
 </body>
 </html>
